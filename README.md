@@ -28,19 +28,68 @@ docker compose up -d
 
 This mounts your `config/grafana.ini` into the container and persists dashboard data in a named volume. Browse to `http://localhost:3000` (default credentials: `admin/admin`).
 
+#### Volume mount reference
+
+| Container path | Purpose | Compose key |
+|---|---|---|
+| `/etc/grafana/grafana.ini` | Grafana configuration file | `./config/grafana.ini:/etc/grafana/grafana.ini:ro` |
+| `/var/lib/grafana` | Dashboard & user data persistence | `grafana-data:/var/lib/grafana` |
+
+#### Custom ports and volumes (docker-compose)
+
+Edit `docker-compose.yml` directly — for example, to expose Grafana on port `3001`:
+
+```yaml
+ports:
+  - "3001:3000"
+```
+
+Or switch the data volume to a bind mount (e.g. on an external disk):
+
+```yaml
+volumes:
+  - /mnt/data/grafana:/var/lib/grafana
+```
+
+After editing, re-run `docker compose up -d`.
+
+#### Standalone `docker run` flags
+
+The equivalent CLI flags for the compose volume mappings look like this:
+
+```bash
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
+  -v grafana-data:/var/lib/grafana \
+  ghcr.io/simplylimitless/homelab-grafana:latest
+```
+
+| Flag | Maps to | Example |
+|---|---|---|
+| `-p` or `--publish` | Port mapping (host:container) | `-p 3001:3000` for a non-default host port |
+| `-v` or `--volume` | Bind mount or named volume | See table above |
+
 ### Deploy from GitHub Container Registry
 
 ```bash
 docker login ghcr.io -u YOUR_GITHUB_USERNAME   # password: a GitHub PAT with `packages` scope (create one at https://github.com/settings/tokens, not the fine-grained type)
 docker pull ghcr.io/simplylimitless/homelab-grafana:latest
-docker run -p 3000:3000 --name grafana ghcr.io/simplylimitless/homelab-grafana:latest
+docker run -d --name grafana -p 3000:3000 \
+  -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
+  -v grafana-data:/var/lib/grafana \
+  ghcr.io/simplylimitless/homelab-grafana:latest
 ```
 
 ### Or build locally
 
 ```bash
 docker build -t homelab-grafana .
-docker run -p 3000:3000 --name grafana homelab-grafana
+docker run -d --name grafana -p 3000:3000 \
+  -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
+  -v grafana-data:/var/lib/grafana \
+  homelab-grafana
 ```
 
 > **Note:** After setting up the `GHCR_PAT` secret, re-run the workflow from the Actions tab or push a test commit if you don't see the image published yet.
