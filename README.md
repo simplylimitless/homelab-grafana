@@ -1,6 +1,6 @@
 # grafana
 
-Grafana instance for a homelab monitoring dashboard. Docker-based, scraping from the same `homelab-prometheus` stack and exposing dashboards via `localhost:3000`.
+Grafana instance for monitoring dashboards. Docker-based, scraping from various data sources and exposing dashboards via `localhost:3000`.
 
 Published images are multi-arch (`linux/amd64`, `linux/arm64`, `linux/arm/v7`), so they run unmodified on x86 servers, 64-bit ARM boards (e.g. Raspberry Pi 4/5, 64-bit OS), and older 32-bit ARMv7 boards.
 
