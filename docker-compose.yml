@@ -1,6 +1,6 @@
 services:
   grafana:
-    image: ghcr.io/simplylimitless/homelab-grafana:latest
+    image: ghcr.io/simplylimitless/grafana:latest
     pull_policy: always
     restart: unless-stopped
     ports:

@@ -1,4 +1,4 @@
-# homelab-grafana
+# grafana
 
 Grafana instance for a homelab monitoring dashboard. Docker-based, scraping from the same `homelab-prometheus` stack and exposing dashboards via `localhost:3000`.
 
@@ -65,7 +65,7 @@ docker run -d \
   -p 3000:3000 \
   -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
   -v grafana-data:/var/lib/grafana \
-  ghcr.io/simplylimitless/homelab-grafana:latest
+  ghcr.io/simplylimitless/grafana:latest
 ```
 
 | Flag | Maps to | Example |
@@ -77,27 +77,27 @@ docker run -d \
 
 ```bash
 docker login ghcr.io -u YOUR_GITHUB_USERNAME   # password: a GitHub PAT with `packages` scope (create one at https://github.com/settings/tokens, not the fine-grained type)
-docker pull ghcr.io/simplylimitless/homelab-grafana:latest
+docker pull ghcr.io/simplylimitless/grafana:latest
 docker run -d --name grafana -p 3000:3000 \
   -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
   -v grafana-data:/var/lib/grafana \
-  ghcr.io/simplylimitless/homelab-grafana:latest
+  ghcr.io/simplylimitless/grafana:latest
 ```
 
 ### Or build locally
 
 ```bash
-docker build -t homelab-grafana .
+docker build -t grafana .
 docker run -d --name grafana -p 3000:3000 \
   -v "$(pwd)/config/grafana.ini:/etc/grafana/grafana.ini:ro" \
   -v grafana-data:/var/lib/grafana \
-  homelab-grafana
+  grafana
 ```
 
 This produces a single-arch image for your local machine. To build and load a multi-arch image (e.g. to test an ARM target from an x86 host), use `docker buildx` with QEMU emulation:
 
 ```bash
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t homelab-grafana .
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t grafana .
 ```
 
 Note that `--load` only accepts one platform at a time; multi-platform builds must be pushed to a registry (`--push`) or built one platform at a time for local use.
@@ -109,7 +109,7 @@ Note that `--load` only accepts one platform at a time; multi-platform builds mu
 Pushing to `main` triggers an automatic multi-arch build for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (see [`.github/workflows/docker.yml`](.github/workflows/docker.yml)), using QEMU + Buildx to cross-build the non-native architectures. Each push is tagged with both `latest` and a numeric build ID for rollback:
 
 ```bash
-docker pull ghcr.io/simplylimitless/homelab-grafana:3
+docker pull ghcr.io/simplylimitless/grafana:3
 ```
 
 **GHCR write permission:** The workflow uses a PAT stored in the repository secret `GHCR_PAT` to push to GitHub Container Registry. Create one at https://github.com/settings/tokens (classic tokens, not fine-grained — that scope isn't available there) with the **`packages`** scope ticked, then add it as a repo secret named `GHCR_PAT`. The automatic `GITHUB_TOKEN` doesn't grant GHCR package write permissions, so this PAT is required.
